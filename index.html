@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lyzy's Comet Dashboard</title>
+    <title>Lyzy's Sparkle-Beat Dashboard</title>
     <style>
         :root {
             --glow-color: #00d4ff;
-            --card-bg: rgba(10, 10, 10, 0.85);
+            --card-bg: rgba(5, 5, 5, 0.85);
             --online-color: #00ff88;
             --offline-color: #ff4b4b;
+            --accent-hue: 190;
         }
 
         body {
@@ -17,7 +18,7 @@
             margin: 0;
             font-family: 'Segoe UI', sans-serif;
             color: white;
-            overflow-x: hidden;
+            overflow: hidden;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -25,94 +26,84 @@
             justify-content: center;
         }
 
-        /* Background Canvas */
         #canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-        /* Welcome Banner */
         #welcomeBanner {
             display: none;
-            font-size: clamp(1.5rem, 5vw, 3rem);
-            font-weight: bold;
-            color: var(--glow-color);
-            text-shadow: 0 0 20px var(--glow-color), 0 0 40px var(--glow-color);
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 900;
+            color: hsl(var(--accent-hue), 100%, 50%);
+            text-shadow: 0 0 20px hsl(var(--accent-hue), 100%, 60%);
             margin-bottom: 20px;
             text-transform: uppercase;
-            letter-spacing: 8px;
+            letter-spacing: 12px;
             text-align: center;
         }
 
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 15px rgba(0, 212, 255, 0.2); border-color: rgba(0, 212, 255, 0.3); }
-            50% { box-shadow: 0 0 35px rgba(0, 212, 255, 0.6); border-color: var(--glow-color); }
-        }
-
         .controls { margin-bottom: 40px; display: flex; gap: 15px; z-index: 10; }
+        
         button {
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid var(--glow-color);
-            color: var(--glow-color);
-            padding: 12px 24px;
-            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid hsl(var(--accent-hue), 100%, 50%);
+            color: hsl(var(--accent-hue), 100%, 50%);
+            padding: 12px 28px;
+            border-radius: 30px;
             cursor: pointer;
             transition: 0.3s;
             font-weight: bold;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        button:hover { background: var(--glow-color); color: black; box-shadow: 0 0 30px var(--glow-color); }
+        button:hover { background: hsl(var(--accent-hue), 100%, 50%); color: black; box-shadow: 0 0 30px hsl(var(--accent-hue), 100%, 50%); }
 
         .container { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; z-index: 5; }
 
         .profile-card {
-            width: 220px;
+            width: 210px;
             background: var(--card-bg);
-            border-radius: 25px;
-            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 30px;
+            border: 2px solid hsl(var(--accent-hue), 100%, 50%);
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 30px 15px;
-            animation: pulseGlow 4s infinite ease-in-out;
-            transition: 0.3s;
-            backdrop-filter: blur(10px);
+            padding: 35px 20px;
+            transition: transform 0.1s, border-color 0.3s, box-shadow 0.3s;
+            backdrop-filter: blur(15px);
         }
-        .profile-card:hover { transform: translateY(-10px); border-color: var(--glow-color); }
+        
+        /* The Beat Pulse Class */
+        .card-pulse { transform: scale(1.1) !important; box-shadow: 0 0 50px hsla(var(--accent-hue), 100%, 50%, 0.8); }
 
         .profile-img {
             width: 110px; height: 110px;
-            border-radius: 50%; border: 3px solid var(--glow-color);
+            border-radius: 50%; border: 3px solid hsl(var(--accent-hue), 100%, 50%);
             margin-bottom: 15px; object-fit: cover;
         }
 
-        .name { font-size: 1.4rem; font-weight: bold; margin-bottom: 10px; }
+        .name { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; }
 
         .status-area {
-            display: flex; align-items: center; gap: 10px;
-            font-size: 0.85rem; padding: 6px 18px; border-radius: 20px;
-            background: rgba(255,255,255,0.05); margin-bottom: 20px;
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.8rem; padding: 6px 18px; border-radius: 20px;
+            background: rgba(255,255,255,0.1); margin-bottom: 15px;
         }
-        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot { width: 9px; height: 9px; border-radius: 50%; }
         .online .dot { background: var(--online-color); box-shadow: 0 0 10px var(--online-color); }
         .offline .dot { background: var(--offline-color); }
 
         .fb-link {
             text-decoration: none; background: #1877F2; color: white;
-            padding: 10px 22px; border-radius: 25px; font-weight: bold;
-            font-size: 0.8rem; transition: 0.3s;
+            padding: 10px 22px; border-radius: 20px; font-weight: bold;
         }
-        .fb-link:hover { transform: scale(1.1); background: #145dbf; }
 
-        /* Login Modal */
         #loginModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 100; justify-content: center; align-items: center;
         }
-        .modal-content { background: #111; padding: 40px; border: 2px solid var(--glow-color); border-radius: 20px; text-align: center; }
-        input { display: block; width: 250px; padding: 12px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; border-radius: 5px; }
+        .modal-content { background: #000; padding: 40px; border: 2px solid #00d4ff; border-radius: 20px; text-align: center; }
+        input { display: block; width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #333; color: white; border-radius: 8px; }
 
-        .admin-active .status-area { cursor: pointer; border: 1px dashed white; }
-
-        /* Hidden YouTube Player */
-        #ytPlayer { position: absolute; top: -1000px; left: -1000px; visibility: hidden; }
+        #ytPlayer { position: absolute; top: -1000px; }
     </style>
 </head>
 <body>
@@ -123,100 +114,134 @@
     <div id="welcomeBanner">Welcome Lyzy</div>
 
     <div class="controls">
-        <button id="musicBtn" onclick="toggleMusic()">🎵 Play Music</button>
-        <button onclick="openLogin()">🛠️ Admin: <span id="admin-status">OFF</span></button>
+        <button id="musicBtn" onclick="toggleMusic()">🎵 Start Beat</button>
+        <button onclick="openLogin()">🛠️ Admin</button>
     </div>
 
     <div class="container" id="profileGrid"></div>
 
     <div id="loginModal">
         <div class="modal-content">
-            <h3 style="color: var(--glow-color)">Admin Access</h3>
+            <h3 style="color: #00d4ff">Admin Verification</h3>
             <input type="text" id="username" placeholder="Username">
             <input type="password" id="password" placeholder="Password">
             <button onclick="checkLogin()">Login</button>
-            <button onclick="closeLogin()" style="border-color: red; color: red;">Cancel</button>
         </div>
     </div>
 
-    <audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
-
 <script>
-    // --- CONFIGURE YOUR STUFF HERE ---
-    const youtubeVideoID = "Bf2ml3oE2JA"; // <--- CHANGE THIS ID TO ANY YOUTUBE VIDEO ID
-
-    const profileData = [
-        { name: "Alex", img: "https://i.pravatar.cc/150?u=1", fb: "https://facebook.com" },
-        { name: "Jordan", img: "https://i.pravatar.cc/150?u=2", fb: "https://facebook.com" },
-        { name: "Skylar", img: "https://i.pravatar.cc/150?u=3", fb: "https://facebook.com" },
-        { name: "Riley", img: "https://i.pravatar.cc/150?u=4", fb: "https://facebook.com" },
-        { name: "Charlie", img: "https://i.pravatar.cc/150?u=5", fb: "https://facebook.com" }
-    ];
-
-    // --- YOUTUBE PLAYER LOGIC ---
+    const youtubeVideoID = "jfKfPfyJRdk"; // Change this for different music
     let player;
+    let hue = 190;
+    let isPlaying = false;
+
+    // Load YouTube API
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     document.head.appendChild(tag);
 
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('ytPlayer', {
-            height: '0', width: '0',
             videoId: youtubeVideoID,
             playerVars: { 'autoplay': 0, 'loop': 1, 'playlist': youtubeVideoID },
-            events: { 'onReady': onPlayerReady }
+            events: { 'onStateChange': (e) => isPlaying = (e.data === 1) }
         });
     }
-
-    function onPlayerReady(event) { console.log("Music Ready"); }
 
     function toggleMusic() {
         const btn = document.getElementById('musicBtn');
         if (player.getPlayerState() === 1) {
             player.pauseVideo();
-            btn.innerText = "🎵 Play Music";
+            btn.innerText = "🎵 Start Beat";
         } else {
             player.playVideo();
-            btn.innerText = "🔇 Pause Music";
+            btn.innerText = "🔇 Stop Beat";
         }
     }
 
-    // --- COMET BACKGROUND ---
+    // --- COMET, SPARKLES & BEAT ---
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     let stars = [];
+    let particles = [];
+
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resize);
     resize();
+
+    class Particle {
+        constructor(x, y) {
+            this.x = x; this.y = y;
+            this.vx = (Math.random() - 0.5) * 10;
+            this.vy = (Math.random() - 0.5) * 10;
+            this.alpha = 1;
+        }
+        draw() {
+            ctx.fillStyle = `hsla(${hue}, 100%, 70%, ${this.alpha})`;
+            ctx.beginPath(); ctx.arc(this.x, this.y, 2, 0, Math.PI*2); ctx.fill();
+        }
+        update() { this.x += this.vx; this.y += this.vy; this.alpha -= 0.02; }
+    }
 
     class Star {
         constructor() { this.reset(); }
         reset() {
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 2;
-            this.speed = Math.random() * 4 + 2;
+            this.size = Math.random() * 2 + 1;
+            this.speed = Math.random() * 6 + 3;
         }
         update() {
-            this.x += this.speed; this.y += this.speed * 0.5;
-            if (this.x > canvas.width || this.y > canvas.height) this.reset();
+            let s = isPlaying ? this.speed * 2 : this.speed;
+            this.x += s;
+            if (this.x > canvas.width) {
+                // Explosion effect when comet hits edge
+                for(let i=0; i<8; i++) particles.push(new Particle(canvas.width, this.y));
+                this.reset();
+                this.x = -10;
+            }
         }
         draw() {
-            ctx.fillStyle = '#00d4ff';
-            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
-            ctx.strokeStyle = 'rgba(0, 212, 255, 0.15)';
-            ctx.beginPath(); ctx.moveTo(this.x, this.y); ctx.lineTo(this.x - 40, this.y - 20); ctx.stroke();
+            ctx.fillStyle = `hsl(${hue}, 100%, 75%)`;
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
         }
     }
+
     for (let i = 0; i < 60; i++) stars.push(new Star());
+
     function animate() {
-        ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fillRect(0,0,canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        if (isPlaying) {
+            hue = (hue + 1) % 360;
+            document.documentElement.style.setProperty('--accent-hue', hue);
+            
+            // Random Beat Jumps
+            if (Math.random() > 0.96) {
+                document.querySelectorAll('.profile-card').forEach(c => c.classList.add('card-pulse'));
+                setTimeout(() => document.querySelectorAll('.profile-card').forEach(c => c.classList.remove('card-pulse')), 80);
+            }
+        }
+
         stars.forEach(s => { s.update(); s.draw(); });
+        particles.forEach((p, i) => {
+            p.update(); p.draw();
+            if (p.alpha <= 0) particles.splice(i, 1);
+        });
         requestAnimationFrame(animate);
     }
     animate();
 
-    // --- PROFILE & ADMIN LOGIC ---
+    // --- LOGIC ---
+    const profileData = [
+        { name: "Alex", img: "https://i.pravatar.cc/150?u=1", fb: "#" },
+        { name: "Jordan", img: "https://i.pravatar.cc/150?u=2", fb: "#" },
+        { name: "Skylar", img: "https://i.pravatar.cc/150?u=3", fb: "#" },
+        { name: "Riley", img: "https://i.pravatar.cc/150?u=4", fb: "#" },
+        { name: "Charlie", img: "https://i.pravatar.cc/150?u=5", fb: "#" }
+    ];
+
     const grid = document.getElementById('profileGrid');
     let isAdmin = false;
 
@@ -226,47 +251,27 @@
         card.innerHTML = `
             <img src="${user.img}" class="profile-img">
             <div class="name">${user.name}</div>
-            <div class="status-area online" onclick="handleStatus(event, this)">
+            <div class="status-area online" onclick="handleStatus(this)">
                 <span class="dot"></span><span class="status-text">Online</span>
             </div>
-            <a href="${user.fb}" target="_blank" class="fb-link">Facebook</a>
+            <a href="${user.fb}" target="_blank" class="fb-link">Visit FB</a>
         `;
         grid.appendChild(card);
     });
 
-    function openLogin() {
-        if (isAdmin) {
-            isAdmin = false;
-            document.getElementById('admin-status').innerText = "OFF";
-            document.getElementById('welcomeBanner').style.display = 'none';
-            document.body.classList.remove('admin-active');
-        } else {
-            document.getElementById('loginModal').style.display = 'flex';
-        }
-    }
-
+    function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
     function checkLogin() {
-        const u = document.getElementById('username').value;
-        const p = document.getElementById('password').value;
-        if (u === "lyzy" && p === "prolyzy") {
+        if (document.getElementById('username').value === "lyzy" && document.getElementById('password').value === "prolyzy") {
             isAdmin = true;
-            document.getElementById('admin-status').innerText = "ON";
             document.getElementById('welcomeBanner').style.display = 'block';
-            document.body.classList.add('admin-active');
             document.getElementById('loginModal').style.display = 'none';
-        } else { alert("Access Denied"); }
+        } else { alert("Wrong Password!"); }
     }
-
-    function handleStatus(e, el) {
+    function handleStatus(el) {
         if (!isAdmin) return;
-        const isOnline = el.classList.contains('online');
-        el.classList.toggle('online', !isOnline);
-        el.classList.toggle('offline', isOnline);
-        el.querySelector('.status-text').innerText = isOnline ? "Offline" : "Online";
-        document.getElementById('clickSound').play();
+        el.classList.toggle('online'); el.classList.toggle('offline');
+        el.querySelector('.status-text').innerText = el.classList.contains('online') ? "Online" : "Offline";
     }
-
-    function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
 </script>
 </body>
 </html>
