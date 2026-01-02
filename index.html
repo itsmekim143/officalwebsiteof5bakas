@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lyzy's Mobile Beat Dashboard</title>
+    <title>Lyzy's Dashboard</title>
     <style>
         :root {
             --glow-color: #00d4ff;
@@ -27,13 +27,30 @@
 
         #canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
+        /* LIVE CLOCK STYLE */
+        #liveClock {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: hsl(var(--accent-hue), 100%, 70%);
+            text-shadow: 0 0 10px hsl(var(--accent-hue), 100%, 50%);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 15px;
+            border-radius: 10px;
+            border: 1px solid hsla(var(--accent-hue), 100%, 50%, 0.3);
+            z-index: 20;
+        }
+
         #welcomeBanner {
             display: none;
             font-size: clamp(1.2rem, 5vw, 2.5rem);
             font-weight: 900;
             color: hsl(var(--accent-hue), 100%, 50%);
             text-shadow: 0 0 15px hsl(var(--accent-hue), 100%, 60%);
-            margin: 20px 0 10px 0;
+            margin: 40px 0 10px 0;
             text-transform: uppercase;
             letter-spacing: 5px;
             text-align: center;
@@ -45,7 +62,6 @@
             display: flex; 
             gap: 10px; 
             z-index: 10; 
-            flex-wrap: wrap;
             justify-content: center;
         }
         
@@ -62,86 +78,88 @@
             transition: 0.3s;
         }
 
-        /* MOBILE SCROLL CONTAINER */
         .container { 
             display: flex; 
-            gap: 20px; 
             flex-wrap: wrap; 
+            gap: 25px; 
             justify-content: center; 
             z-index: 5; 
             width: 95%;
-            max-width: 1200px;
+            max-width: 1400px;
             overflow-y: auto; 
-            padding-bottom: 100px; /* Extra space for mobile bars */
-            scrollbar-width: none; /* Hide scrollbar Firefox */
+            padding: 20px;
+            padding-bottom: 100px;
+            scrollbar-width: none;
         }
-        .container::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome/Safari */
+        .container::-webkit-scrollbar { display: none; }
 
         .profile-card {
-            width: 260px; /* Slightly wider for mobile readability */
+            width: 210px; 
             background: var(--card-bg); 
             border-radius: 25px;
             border: 2px solid hsl(var(--accent-hue), 100%, 50%);
             display: flex; 
             flex-direction: column; 
             align-items: center;
-            padding: 20px; 
+            padding: 25px 20px; 
             transition: 0.2s; 
             backdrop-filter: blur(10px);
         }
 
-        @media (max-width: 600px) {
-            .container { flex-direction: column; align-items: center; }
-            .profile-card { width: 85%; }
+        /* MOBILE VERTICAL */
+        @media (max-width: 768px) {
+            .container { flex-direction: column; align-items: center; flex-wrap: nowrap; }
+            .profile-card { width: 280px; }
+            #liveClock { top: 10px; right: 10px; font-size: 0.9rem; }
         }
         
         .card-pulse { transform: scale(1.05) !important; box-shadow: 0 0 30px hsla(var(--accent-hue), 100%, 50%, 0.6); }
 
         .profile-img {
-            width: 90px; height: 90px; border-radius: 50%; 
+            width: 100px; height: 100px; border-radius: 50%; 
             border: 3px solid var(--role-color, var(--glow-color));
-            margin-bottom: 12px; object-fit: cover;
+            margin-bottom: 15px; object-fit: cover;
         }
 
-        .name { font-size: 1.2rem; font-weight: bold; margin-bottom: 3px; }
+        .name { font-size: 1.3rem; font-weight: bold; margin-bottom: 5px; }
         
         .role {
-            font-size: 0.7rem; color: var(--role-color, #fff);
+            font-size: 0.75rem; color: var(--role-color, #fff);
             text-shadow: 0 0 8px var(--role-color);
             text-transform: uppercase; letter-spacing: 2px;
-            margin-bottom: 12px; font-weight: 900;
+            margin-bottom: 15px; font-weight: 900;
         }
 
         .status-area {
             display: flex; align-items: center; gap: 8px;
-            font-size: 0.75rem; padding: 5px 15px; border-radius: 15px;
-            background: rgba(255,255,255,0.1); margin-bottom: 12px;
+            font-size: 0.8rem; padding: 6px 18px; border-radius: 15px;
+            background: rgba(255,255,255,0.1); margin-bottom: 15px;
         }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot { width: 9px; height: 9px; border-radius: 50%; }
         .online .dot { background: var(--online-color); box-shadow: 0 0 8px var(--online-color); }
         .offline .dot { background: var(--offline-color); }
 
         .fb-link {
             text-decoration: none; background: #1877F2; color: white;
-            padding: 8px 20px; border-radius: 15px; font-weight: bold; font-size: 0.75rem;
+            padding: 9px 22px; border-radius: 20px; font-weight: bold; font-size: 0.8rem;
         }
 
-        /* ADMIN MODAL */
+        /* ADMIN UI */
         #loginModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 100; justify-content: center; align-items: center;
         }
         .modal-content { 
-            background: #000; padding: 20px; border: 2px solid #00d4ff; 
-            border-radius: 20px; text-align: center; width: 90%; max-width: 350px; 
+            background: #000; padding: 25px; border: 2px solid #00d4ff; 
+            border-radius: 20px; text-align: center; width: 90%; max-width: 360px; 
             max-height: 85vh; overflow-y: auto;
         }
-        input, select { display: block; width: 85%; padding: 12px; margin: 10px auto; background: #111; border: 1px solid #333; color: white; border-radius: 8px; font-size: 16px; /* Prevents iOS zoom on focus */}
+        input, select { display: block; width: 85%; padding: 12px; margin: 10px auto; background: #111; border: 1px solid #333; color: white; border-radius: 8px; font-size: 16px; }
         
         #adminPanel { display: none; margin-top: 15px; border-top: 1px solid #333; padding-top: 15px; }
         .manage-list { margin-top: 15px; text-align: left; background: #111; padding: 10px; border-radius: 10px; }
-        .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #222; font-size: 0.85rem; }
-        .del-btn { background: #ff4b4b; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; }
+        .del-btn { background: #ff4b4b; color: white; border: none; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.75rem; }
 
         #ytPlayer { position: absolute; top: -1000px; }
     </style>
@@ -150,6 +168,8 @@
 
     <canvas id="canvas"></canvas>
     <div id="ytPlayer"></div>
+
+    <div id="liveClock">00:00:00 AM</div>
 
     <div id="welcomeBanner">Welcome Lyzy</div>
 
@@ -163,12 +183,12 @@
 
     <div id="loginModal">
         <div class="modal-content">
-            <h3 id="modalTitle" style="color: #00d4ff">Access</h3>
+            <h3 id="modalTitle" style="color: #00d4ff">System Access</h3>
             <div id="loginFields">
                 <input type="text" id="username" placeholder="Username">
                 <input type="password" id="password" placeholder="Password">
                 <button onclick="checkLogin()" style="width:100%">Login</button>
-                <button onclick="closeLogin()" style="width:100%; margin-top:10px; border-color: #555;">Close</button>
+                <button onclick="closeLogin()" style="width:100%; margin-top:10px; border-color: #555;">Cancel</button>
             </div>
             <div id="adminPanel">
                 <input type="text" id="newName" placeholder="Name">
@@ -180,11 +200,8 @@
                 </select>
                 <input type="text" id="newImg" placeholder="Image URL">
                 <input type="text" id="newFb" placeholder="FB Profile URL">
-                <button onclick="addNewProfile()" style="width: 100%;">Add Friend</button>
-                <div class="manage-list">
-                    <h5 style="margin:0 0 10px 0; color: #ff4b4b;">Manage:</h5>
-                    <div id="adminManageItems"></div>
-                </div>
+                <button onclick="addNewProfile()" style="width: 100%;">Save Friend</button>
+                <div class="manage-list" id="adminManageItems"></div>
                 <button onclick="closeLogin()" style="width: 100%; margin-top: 15px; border-color: #555;">Minimize</button>
             </div>
         </div>
@@ -193,6 +210,21 @@
 <script>
     const youtubeVideoID = "Bf2ml3oE2JA"; 
     let player, hue = 190, isPlaying = false, isAdmin = false;
+
+    // --- LIVE CLOCK LOGIC ---
+    function updateClock() {
+        const now = new Date();
+        let hours = now.getHours();
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        const strTime = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+        document.getElementById('liveClock').textContent = strTime;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
     // YT API
     const tag = document.createElement('script');
@@ -210,7 +242,6 @@
         else player.playVideo();
     }
 
-    // BG Engine
     const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
     let stars = [], particles = [];
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
@@ -236,7 +267,8 @@
     function animate() {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         if (isPlaying) {
-            hue = (hue + 1) % 360; document.documentElement.style.setProperty('--accent-hue', hue);
+            hue = (hue + 1) % 360; 
+            document.documentElement.style.setProperty('--accent-hue', hue);
             if (Math.random() > 0.98) {
                 document.querySelectorAll('.profile-card').forEach(c => { c.classList.add('card-pulse'); setTimeout(() => c.classList.remove('card-pulse'), 100); });
             }
@@ -247,7 +279,6 @@
     }
     animate();
 
-    // Data Engine
     let savedProfiles = JSON.parse(localStorage.getItem('lyzyProfiles')) || [];
 
     function saveAndRefresh() {
@@ -281,11 +312,11 @@
 
     function renderAdminList() {
         const listContainer = document.getElementById('adminManageItems');
-        listContainer.innerHTML = '';
+        listContainer.innerHTML = '<h5 style="margin:10px 0; color:red">Manage Friends:</h5>';
         savedProfiles.forEach((user, index) => {
             const div = document.createElement('div');
             div.className = 'manage-item';
-            div.innerHTML = `<span>${user.name}</span><button class="del-btn" onclick="deleteProfile(${index})">Del</button>`;
+            div.innerHTML = `<span>${user.name}</span><button class="del-btn" onclick="deleteProfile(${index})">Remove</button>`;
             listContainer.appendChild(div);
         });
     }
@@ -300,12 +331,11 @@
     }
 
     function deleteProfile(index) {
-        if(confirm("Remove?")) { savedProfiles.splice(index, 1); saveAndRefresh(); }
+        if(confirm("Delete Friend?")) { savedProfiles.splice(index, 1); saveAndRefresh(); }
     }
 
     renderDashboard();
 
-    // Login
     function openLogin() { document.getElementById('loginModal').style.display = 'flex'; if(isAdmin) renderAdminList(); }
     function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
     function checkLogin() {
@@ -317,7 +347,7 @@
             document.getElementById('loginFields').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
             renderAdminList();
-        } else { alert("Error"); }
+        } else { alert("Access Denied"); }
     }
     function exitAdmin() {
         isAdmin = false;
