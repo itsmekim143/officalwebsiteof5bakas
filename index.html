@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Glow Profiles</title>
+    <style>
+        body {
+            background-color: #050505;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .profile-card {
+            position: relative;
+            width: 150px;
+            height: 200px;
+            background: #111;
+            border-radius: 15px;
+            border: 2px solid #00d4ff;
+            box-shadow: 0 0 15px #00d4ff66;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            text-align: center;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 30px #00d4ff;
+        }
+
+        .profile-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .name { color: white; font-size: 14px; margin: 5px 0; }
+
+        /* Manual Status Light */
+        .status {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .online { color: #00ff88; }
+        .offline { color: #ff4b4b; }
+        
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .bg-online { background-color: #00ff88; box-shadow: 0 0 8px #00ff88; }
+        .bg-offline { background-color: #ff4b4b; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="profile-card" onclick="playSound()">
+        <img src="https://via.placeholder.com/80" class="profile-img" alt="Profile">
+        <div class="name">User One</div>
+        <div class="status online"><span class="dot bg-online"></span> Online</div>
+    </div>
+
+    <div class="profile-card" onclick="playSound()">
+        <img src="https://via.placeholder.com/80" class="profile-img" alt="Profile">
+        <div class="name">User Two</div>
+        <div class="status offline"><span class="dot bg-offline"></span> Offline</div>
+    </div>
+
+    </div>
+
+<audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
+
+<script>
+    function playSound() {
+        const audio = document.getElementById('clickSound');
+        audio.currentTime = 0; // Reset to start
+        audio.play();
+    }
+</script>
+
+</body>
+</html>
