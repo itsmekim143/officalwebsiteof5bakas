@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lyzy's Professional Dashboard</title>
+    <title>Lyzy's Master Dashboard</title>
     <style>
         :root {
             --glow-color: #00d4ff;
@@ -30,13 +30,13 @@
 
         #welcomeBanner {
             display: none;
-            font-size: clamp(1.8rem, 6vw, 3.5rem);
+            font-size: clamp(1.5rem, 5vw, 3rem);
             font-weight: 900;
             color: hsl(var(--accent-hue), 100%, 50%);
             text-shadow: 0 0 20px hsl(var(--accent-hue), 100%, 60%);
             margin-bottom: 20px;
             text-transform: uppercase;
-            letter-spacing: 10px;
+            letter-spacing: 8px;
             text-align: center;
         }
 
@@ -52,17 +52,17 @@
             transition: 0.3s;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 0.85rem;
         }
         button:hover { background: hsl(var(--accent-hue), 100%, 50%); color: black; box-shadow: 0 0 25px hsl(var(--accent-hue), 100%, 50%); }
 
         .container { 
             display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; 
-            z-index: 5; max-height: 65vh; overflow-y: auto; padding: 20px;
+            z-index: 5; max-height: 60vh; overflow-y: auto; padding: 20px;
             scrollbar-width: thin; scrollbar-color: var(--glow-color) transparent;
         }
 
         .profile-card {
+            position: relative;
             width: 210px; background: var(--card-bg); border-radius: 30px;
             border: 2px solid hsl(var(--accent-hue), 100%, 50%);
             display: flex; flex-direction: column; align-items: center;
@@ -74,7 +74,7 @@
         .profile-img {
             width: 100px; height: 100px; border-radius: 50%; 
             border: 3px solid var(--role-color, var(--glow-color));
-            margin-bottom: 15px; object-fit: cover; box-shadow: 0 0 15px var(--role-color);
+            margin-bottom: 15px; object-fit: cover;
         }
 
         .name { font-size: 1.3rem; font-weight: bold; margin-bottom: 5px; text-align: center;}
@@ -92,7 +92,7 @@
             background: rgba(255,255,255,0.1); margin-bottom: 15px;
         }
         .dot { width: 9px; height: 9px; border-radius: 50%; }
-        .online .dot { background: var(--online-color); box-shadow: 0 0 10px var(--online-color); }
+        .online .dot { background: var(--online-color); }
         .offline .dot { background: var(--offline-color); }
 
         .fb-link {
@@ -100,15 +100,19 @@
             padding: 10px 22px; border-radius: 20px; font-weight: bold; font-size: 0.8rem;
         }
 
-        /* Modal / Panel UI */
+        /* ADMIN MODAL STYLES */
         #loginModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center;
         }
-        .modal-content { background: #000; padding: 30px; border: 2px solid #00d4ff; border-radius: 20px; text-align: center; width: 340px; }
+        .modal-content { background: #000; padding: 25px; border: 2px solid #00d4ff; border-radius: 20px; text-align: center; width: 380px; max-height: 90vh; overflow-y: auto; }
         input, select { display: block; width: 90%; padding: 10px; margin: 10px auto; background: #111; border: 1px solid #333; color: white; border-radius: 8px; }
         
         #adminPanel { display: none; margin-top: 15px; border-top: 1px solid #333; padding-top: 15px; }
+
+        .manage-list { margin-top: 20px; text-align: left; background: #111; padding: 10px; border-radius: 10px; }
+        .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #222; font-size: 0.9rem; }
+        .del-btn { background: #ff4b4b; color: white; border: none; padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; }
 
         #ytPlayer { position: absolute; top: -1000px; }
     </style>
@@ -121,9 +125,9 @@
     <div id="welcomeBanner">Welcome Lyzy</div>
 
     <div class="controls">
-        <button id="musicBtn" onclick="toggleMusic()">🎵 Start Beat</button>
+        <button id="musicBtn" onclick="toggleMusic()">🎵 Beat</button>
         <button id="adminBtn" onclick="openLogin()">🛠️ Admin</button>
-        <button id="exitAdminBtn" onclick="exitAdmin()" style="display:none; border-color: #ff4b4b; color: #ff4b4b;">🔒 Exit Admin</button>
+        <button id="exitAdminBtn" onclick="exitAdmin()" style="display:none; border-color: red; color: red;">🔒 Logout</button>
     </div>
 
     <div class="container" id="profileGrid"></div>
@@ -140,33 +144,36 @@
             </div>
 
             <div id="adminPanel">
-                <h4 style="color: var(--online-color); margin: 0 0 10px 0;">Add Profile</h4>
+                <h4 style="color: var(--online-color)">Add New Friend</h4>
                 <input type="text" id="newName" placeholder="Name">
                 <select id="newRole">
-                    <option value="Friend">Friend</option>
-                    <option value="Web Creator">Web Creator</option>
-                    <option value="Admin">Admin</option>
-                    <option value="VIP">VIP</option>
+                    <option value="Friend">Friend (Green)</option>
+                    <option value="Web Creator">Web Creator (Blue)</option>
+                    <option value="Admin">Admin (Red)</option>
+                    <option value="VIP">VIP (Purple)</option>
                 </select>
                 <input type="text" id="newImg" placeholder="Image URL">
                 <input type="text" id="newFb" placeholder="Facebook URL">
-                <button onclick="addNewProfile()" style="width: 100%; margin-bottom: 5px;">Create Card</button>
-                <button onclick="closeLogin()" style="width: 100%; border-color: #555; color: #aaa;">Minimize</button>
+                <button onclick="addNewProfile()" style="width: 100%;">Save Profile</button>
+
+                <div class="manage-list">
+                    <h5 style="margin:0 0 10px 0; color: #ff4b4b;">Remove Profiles:</h5>
+                    <div id="adminManageItems"></div>
+                </div>
+
+                <button onclick="closeLogin()" style="width: 100%; margin-top: 15px; border-color: #555;">Close Panel</button>
             </div>
         </div>
     </div>
 
 <script>
     const youtubeVideoID = "Bf2ml3oE2JA"; 
-    let player;
-    let hue = 190;
-    let isPlaying = false;
-    let isAdmin = false;
+    let player, hue = 190, isPlaying = false, isAdmin = false;
 
+    // --- YT API ---
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     document.head.appendChild(tag);
-
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('ytPlayer', {
             videoId: youtubeVideoID,
@@ -174,147 +181,92 @@
             events: { 'onStateChange': (e) => isPlaying = (e.data === 1) }
         });
     }
-
     function toggleMusic() {
         if (player.getPlayerState() === 1) player.pauseVideo();
         else player.playVideo();
     }
 
-    // --- VISUAL ENGINE ---
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let stars = [];
-    let particles = [];
+    // --- VISUALS ---
+    const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
+    let stars = [], particles = [];
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resize);
-    resize();
+    window.addEventListener('resize', resize); resize();
 
     class Particle {
-        constructor(x, y) {
-            this.x = x; this.y = y;
-            this.vx = (Math.random() - 0.5) * 10;
-            this.vy = (Math.random() - 0.5) * 10;
-            this.alpha = 1;
-        }
-        draw() {
-            ctx.fillStyle = `hsla(${hue}, 100%, 70%, ${this.alpha})`;
-            ctx.beginPath(); ctx.arc(this.x, this.y, 2, 0, Math.PI*2); ctx.fill();
-        }
+        constructor(x, y) { this.x = x; this.y = y; this.vx = (Math.random()-0.5)*10; this.vy = (Math.random()-0.5)*10; this.alpha = 1; }
+        draw() { ctx.fillStyle = `hsla(${hue}, 100%, 70%, ${this.alpha})`; ctx.beginPath(); ctx.arc(this.x, this.y, 2, 0, Math.PI*2); ctx.fill(); }
         update() { this.x += this.vx; this.y += this.vy; this.alpha -= 0.02; }
     }
 
     class Star {
         constructor() { this.reset(); }
-        reset() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 2 + 1;
-            this.speed = Math.random() * 6 + 3;
-        }
+        reset() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; this.size = Math.random()*2+1; this.speed = Math.random()*6+3; }
         update() {
-            let s = isPlaying ? this.speed * 2 : this.speed;
-            this.x += s;
-            if (this.x > canvas.width) {
-                for(let i=0; i<8; i++) particles.push(new Particle(canvas.width, this.y));
-                this.reset();
-                this.x = -10;
-            }
+            let s = isPlaying ? this.speed*2 : this.speed; this.x += s;
+            if (this.x > canvas.width) { for(let i=0; i<5; i++) particles.push(new Particle(canvas.width, this.y)); this.reset(); this.x = -10; }
         }
-        draw() {
-            ctx.fillStyle = `hsl(${hue}, 100%, 75%)`;
-            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
-        }
+        draw() { ctx.fillStyle = `hsl(${hue}, 100%, 75%)`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); }
     }
-
-    for (let i = 0; i < 60; i++) stars.push(new Star());
+    for (let i = 0; i < 50; i++) stars.push(new Star());
 
     function animate() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         if (isPlaying) {
-            hue = (hue + 1) % 360;
-            document.documentElement.style.setProperty('--accent-hue', hue);
-            if (Math.random() > 0.96) {
-                document.querySelectorAll('.profile-card').forEach(c => {
-                    c.classList.add('card-pulse');
-                    setTimeout(() => c.classList.remove('card-pulse'), 80);
-                });
+            hue = (hue + 1) % 360; document.documentElement.style.setProperty('--accent-hue', hue);
+            if (Math.random() > 0.97) {
+                document.querySelectorAll('.profile-card').forEach(c => { c.classList.add('card-pulse'); setTimeout(() => c.classList.remove('card-pulse'), 80); });
             }
         }
         stars.forEach(s => { s.update(); s.draw(); });
-        particles.forEach((p, i) => {
-            p.update(); p.draw();
-            if (p.alpha <= 0) particles.splice(i, 1);
-        });
+        particles.forEach((p, i) => { p.update(); p.draw(); if (p.alpha <= 0) particles.splice(i, 1); });
         requestAnimationFrame(animate);
     }
     animate();
 
-    // --- CARD ENGINE ---
-    const getRoleColor = (role) => {
-        if (role === "Admin") return "#ff4b4b"; 
-        if (role === "Web Creator") return "#00d4ff"; 
-        if (role === "VIP") return "#e040fb"; 
-        return "#00ff88"; 
-    };
+    // --- DATA MANAGEMENT ---
+    let savedProfiles = JSON.parse(localStorage.getItem('lyzyProfiles')) || [];
 
-    function createCard(user) {
-        const color = getRoleColor(user.role);
-        const card = document.createElement('div');
-        card.className = 'profile-card';
-        card.style.setProperty('--role-color', color);
-        card.innerHTML = `
-            <img src="${user.img}" class="profile-img">
-            <div class="name">${user.name}</div>
-            <div class="role">${user.role}</div>
-            <div class="status-area online" onclick="handleStatus(this)">
-                <span class="dot"></span><span class="status-text">Online</span>
-            </div>
-            <a href="${user.fb}" target="_blank" class="fb-link">Visit FB</a>
-        `;
-        document.getElementById('profileGrid').appendChild(card);
+    function saveAndRefresh() {
+        localStorage.setItem('lyzyProfiles', JSON.stringify(savedProfiles));
+        renderDashboard();
+        renderAdminList();
     }
 
-    const initialData = [
-        { name: "Kim Mendez", role: "Web Creator", img: "https://scontent.fdvo5-1.fna.fbcdn.net/v/t39.30808-6/584492367_859708949925441_8244425694192105157_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=0SIxq_UMj7YQ7kNvwEnJ9Mh&_nc_oc=AdmR3YBEJyr-OvBBu2FxXuZX3PwdcTjlPOW5JyhpTfdjUUB2Ly_noH4j215v0PLO5z8&_nc_zt=23&_nc_ht=scontent.fdvo5-1.fna&_nc_gid=WWDXo9mSUsnD_FYRetpCYg&oh=00_Afpg2xHnzxvjxPSx1qo5Fg29cL7VQuUH7zprpZmR67NZYA&oe=695D3378", fb: "#" },
-        { name: "Ryzen Ogabang", role: "Admin", img: "https://scontent.fdvo5-1.fna.fbcdn.net/v/t39.30808-1/590284078_1645969200146630_5912426453274868159_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=107&ccb=1-7&_nc_sid=e99d92&_nc_ohc=pcMfBntykY8Q7kNvwH5adhE&_nc_oc=Adm9ysmPSOrYBem7pNpTjstHwQ9ij3CxSm006hi-3vp3DoWHkwT3ZH9n2Gso8Ble4kI&_nc_zt=24&_nc_ht=scontent.fdvo5-1.fna&_nc_gid=axWgn3OrWVpjG49TXJ1pfw&oh=00_AfrCdnzjfLjuX3mCzm22pYlOdDcYZ--xbX5cJ6ZH-ss7YQ&oe=695D3D2B", fb: "#" }
-    ];
-    initialData.forEach(user => createCard(user));
+    function renderDashboard() {
+        const grid = document.getElementById('profileGrid');
+        grid.innerHTML = '';
+        const roleColors = { "Admin": "#ff4b4b", "Web Creator": "#00d4ff", "VIP": "#e040fb", "Friend": "#00ff88" };
 
-    // --- ADMIN CONTROLS ---
-    function openLogin() { 
-        document.getElementById('loginModal').style.display = 'flex'; 
-        if (isAdmin) {
-            document.getElementById('loginFields').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-        }
-    }
-    
-    function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
-
-    function checkLogin() {
-        if (document.getElementById('username').value === "lyzy" && document.getElementById('password').value === "prolyzy") {
-            isAdmin = true;
-            document.getElementById('welcomeBanner').style.display = 'block';
-            document.getElementById('adminBtn').style.display = 'none';
-            document.getElementById('exitAdminBtn').style.display = 'block';
-            document.getElementById('loginFields').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            document.getElementById('modalTitle').innerText = "Admin Panel";
-        } else { alert("Access Denied"); }
+        savedProfiles.forEach((user) => {
+            const color = roleColors[user.role] || "#00ff88";
+            const card = document.createElement('div');
+            card.className = 'profile-card';
+            card.style.setProperty('--role-color', color);
+            card.innerHTML = `
+                <img src="${user.img}" class="profile-img">
+                <div class="name">${user.name}</div>
+                <div class="role">${user.role}</div>
+                <div class="status-area online">
+                    <span class="dot"></span><span class="status-text">Online</span>
+                </div>
+                <a href="${user.fb}" target="_blank" class="fb-link">Visit FB</a>
+            `;
+            grid.appendChild(card);
+        });
     }
 
-    function exitAdmin() {
-        isAdmin = false;
-        document.getElementById('welcomeBanner').style.display = 'none';
-        document.getElementById('exitAdminBtn').style.display = 'none';
-        document.getElementById('adminBtn').style.display = 'block';
-        document.getElementById('loginFields').style.display = 'block';
-        document.getElementById('adminPanel').style.display = 'none';
-        document.getElementById('modalTitle').innerText = "System Access";
-        document.getElementById('username').value = "";
-        document.getElementById('password').value = "";
-        alert("Logged out successfully.");
+    function renderAdminList() {
+        const listContainer = document.getElementById('adminManageItems');
+        listContainer.innerHTML = '';
+        savedProfiles.forEach((user, index) => {
+            const div = document.createElement('div');
+            div.className = 'manage-item';
+            div.innerHTML = `
+                <span>${user.name}</span>
+                <button class="del-btn" onclick="deleteProfile(${index})">Remove</button>
+            `;
+            listContainer.appendChild(div);
+        });
     }
 
     function addNewProfile() {
@@ -323,17 +275,48 @@
         const img = document.getElementById('newImg').value;
         const fb = document.getElementById('newFb').value;
         if (name && img && fb) {
-            createCard({ name, role, img, fb });
+            savedProfiles.push({ name, role, img, fb });
+            saveAndRefresh();
             document.getElementById('newName').value = '';
             document.getElementById('newImg').value = '';
             document.getElementById('newFb').value = '';
-        } else { alert("Error: Missing Data"); }
+        }
     }
 
-    function handleStatus(el) {
-        if (!isAdmin) return;
-        el.classList.toggle('online'); el.classList.toggle('offline');
-        el.querySelector('.status-text').innerText = el.classList.contains('online') ? "Online" : "Offline";
+    function deleteProfile(index) {
+        if(confirm("Delete this profile?")) {
+            savedProfiles.splice(index, 1);
+            saveAndRefresh();
+        }
+    }
+
+    // --- INITIAL LOAD ---
+    renderDashboard();
+
+    // --- LOGIN LOGIC ---
+    function openLogin() { 
+        document.getElementById('loginModal').style.display = 'flex'; 
+        if(isAdmin) renderAdminList();
+    }
+    function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
+    function checkLogin() {
+        if (document.getElementById('username').value === "lyzy" && document.getElementById('password').value === "prolyzy") {
+            isAdmin = true;
+            document.getElementById('welcomeBanner').style.display = 'block';
+            document.getElementById('adminBtn').style.display = 'none';
+            document.getElementById('exitAdminBtn').style.display = 'block';
+            document.getElementById('loginFields').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            renderAdminList();
+        } else { alert("Access Denied"); }
+    }
+    function exitAdmin() {
+        isAdmin = false;
+        document.getElementById('welcomeBanner').style.display = 'none';
+        document.getElementById('exitAdminBtn').style.display = 'none';
+        document.getElementById('adminBtn').style.display = 'block';
+        document.getElementById('loginFields').style.display = 'block';
+        document.getElementById('adminPanel').style.display = 'none';
     }
 </script>
 </body>
