@@ -3,98 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blue Glow Profiles</title>
+    <title>Ultimate Glow Dashboard - Secure</title>
     <style>
+        :root {
+            --glow-color: #00d4ff;
+            --card-bg: #0a0a0a;
+            --online-color: #00ff88;
+            --offline-color: #ff4b4b;
+        }
+
         body {
-            background-color: #050505;
+            background-color: #020202;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            font-family: sans-serif;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px rgba(0, 212, 255, 0.2); border-color: rgba(0, 212, 255, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(0, 212, 255, 0.6); border-color: rgba(0, 212, 255, 1); }
+            100% { box-shadow: 0 0 10px rgba(0, 212, 255, 0.2); border-color: rgba(0, 212, 255, 0.5); }
+        }
+
+        .controls { margin-bottom: 50px; display: flex; gap: 15px; z-index: 10; }
+
+        button {
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid var(--glow-color);
+            color: var(--glow-color);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: var(--glow-color);
+            color: black;
+            box-shadow: 0 0 30px var(--glow-color);
         }
 
         .container {
             display: flex;
-            gap: 20px;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            perspective: 1200px;
         }
 
+        /* 3D Flip Card */
         .profile-card {
+            width: 240px;
+            height: 340px;
             position: relative;
-            width: 150px;
-            height: 200px;
-            background: #111;
-            border-radius: 15px;
-            border: 2px solid #00d4ff;
-            box-shadow: 0 0 15px #00d4ff66;
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-            text-align: center;
-            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .profile-card:hover { transform: rotateY(180deg); }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 25px;
+            border: 2px solid var(--glow-color);
+            background: var(--card-bg);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            animation: pulseGlow 3s infinite ease-in-out;
         }
 
-        .profile-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 0 30px #00d4ff;
-        }
+        .card-back { transform: rotateY(180deg); background: linear-gradient(145deg, #050505, #001a20); }
 
         .profile-img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #00d4ff;
-            margin-bottom: 10px;
+            width: 130px; height: 130px;
+            border-radius: 50%; border: 3px solid var(--glow-color);
+            margin-bottom: 20px; object-fit: cover;
         }
 
-        .name { color: white; font-size: 14px; margin: 5px 0; }
+        .name { font-size: 1.6rem; font-weight: bold; }
 
-        /* Manual Status Light */
-        .status {
-            font-size: 12px;
-            display: flex;
+        .status-area {
+            display: flex; align-items: center; gap: 10px; margin-top: 12px;
+            font-size: 0.9rem; padding: 5px 15px; border-radius: 15px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .online .dot { background: var(--online-color); box-shadow: 0 0 12px var(--online-color); }
+        .offline .dot { background: var(--offline-color); box-shadow: 0 0 8px var(--offline-color); }
+
+        .fb-link {
+            text-decoration: none; background: #1877F2; color: white;
+            padding: 12px 25px; border-radius: 30px; font-weight: bold;
+            transition: 0.3s;
+        }
+
+        /* --- LOGIN MODAL STYLE --- */
+        #loginModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 100;
+            justify-content: center;
             align-items: center;
-            gap: 5px;
         }
-        .online { color: #00ff88; }
-        .offline { color: #ff4b4b; }
-        
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .bg-online { background-color: #00ff88; box-shadow: 0 0 8px #00ff88; }
-        .bg-offline { background-color: #ff4b4b; }
+
+        .modal-content {
+            background: #111;
+            padding: 30px;
+            border: 2px solid var(--glow-color);
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 0 30px var(--glow-color);
+        }
+
+        input {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .admin-active .status-area { cursor: pointer; border: 1px dashed white; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="profile-card" onclick="playSound()">
-        <img src="https://via.placeholder.com/80" class="profile-img" alt="Profile">
-        <div class="name">User One</div>
-        <div class="status online"><span class="dot bg-online"></span> Online</div>
+    <div class="controls">
+        <button onclick="toggleMusic()">🎵 Bg Music</button>
+        <button onclick="openLogin()">🛠️ Admin: <span id="admin-status">OFF</span></button>
     </div>
 
-    <div class="profile-card" onclick="playSound()">
-        <img src="https://via.placeholder.com/80" class="profile-img" alt="Profile">
-        <div class="name">User Two</div>
-        <div class="status offline"><span class="dot bg-offline"></span> Offline</div>
+    <div class="container" id="profileGrid"></div>
+
+    <div id="loginModal">
+        <div class="modal-content">
+            <h3>Admin Login</h3>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="checkLogin()">Login</button>
+            <button onclick="closeLogin()" style="border-color: red; color: red;">Cancel</button>
+        </div>
     </div>
 
-    </div>
-
-<audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
+    <audio id="bgMusic" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+    <audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
 
 <script>
-    function playSound() {
-        const audio = document.getElementById('clickSound');
-        audio.currentTime = 0; // Reset to start
-        audio.play();
+    const profileData = [
+        { name: "Alex", img: "https://i.pravatar.cc/150?u=a1", fb: "https://facebook.com" },
+        { name: "Jordan", img: "https://i.pravatar.cc/150?u=a2", fb: "https://facebook.com" },
+        { name: "Skylar", img: "https://i.pravatar.cc/150?u=a3", fb: "https://facebook.com" },
+        { name: "Riley", img: "https://i.pravatar.cc/150?u=a4", fb: "https://facebook.com" },
+        { name: "Charlie", img: "https://i.pravatar.cc/150?u=a5", fb: "https://facebook.com" }
+    ];
+
+    const grid = document.getElementById('profileGrid');
+    let isAdmin = false;
+
+    profileData.forEach((user) => {
+        const card = document.createElement('div');
+        card.className = 'profile-card';
+        card.innerHTML = `
+            <div class="card-front">
+                <img src="${user.img}" class="profile-img">
+                <div class="name">${user.name}</div>
+                <div class="status-area online" onclick="handleStatusChange(event, this)">
+                    <span class="dot"></span>
+                    <span class="status-text">Online</span>
+                </div>
+            </div>
+            <div class="card-back">
+                <div class="name" style="margin-bottom:25px;">Connect</div>
+                <a href="${user.fb}" target="_blank" class="fb-link">Facebook Profile</a>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+
+    function openLogin() {
+        if (isAdmin) {
+            // If already admin, clicking turns it off
+            isAdmin = false;
+            document.getElementById('admin-status').innerText = "OFF";
+            document.body.classList.remove('admin-active');
+            return;
+        }
+        document.getElementById('loginModal').style.display = 'flex';
+    }
+
+    function closeLogin() {
+        document.getElementById('loginModal').style.display = 'none';
+    }
+
+    function checkLogin() {
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
+
+        if (user === "lyzy" && pass === "prolyzy") {
+            isAdmin = true;
+            document.getElementById('admin-status').innerText = "ON";
+            document.body.classList.add('admin-active');
+            closeLogin();
+            playClick();
+        } else {
+            alert("Wrong credentials!");
+        }
+    }
+
+    function handleStatusChange(event, element) {
+        event.stopPropagation(); 
+        if (!isAdmin) { playClick(); return; }
+        
+        const isOnline = element.classList.contains('online');
+        element.classList.toggle('online', !isOnline);
+        element.classList.toggle('offline', isOnline);
+        element.querySelector('.status-text').innerText = isOnline ? "Offline" : "Online";
+        playClick();
+    }
+
+    function playClick() { document.getElementById('clickSound').play(); }
+    function toggleMusic() {
+        const m = document.getElementById('bgMusic');
+        m.paused ? m.play() : m.pause();
     }
 </script>
-
 </body>
 </html>
