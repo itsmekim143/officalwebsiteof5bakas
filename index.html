@@ -3,152 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Glow Dashboard - Secure</title>
+    <title>Lyzy's Blue Comet Dashboard</title>
     <style>
         :root {
             --glow-color: #00d4ff;
-            --card-bg: #0a0a0a;
+            --card-bg: rgba(10, 10, 10, 0.9);
             --online-color: #00ff88;
             --offline-color: #ff4b4b;
         }
 
         body {
-            background-color: #020202;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            background-color: #000;
             margin: 0;
             font-family: 'Segoe UI', sans-serif;
             color: white;
             overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- COMET BACKGROUND --- */
+        #canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+        }
+
+        /* --- WELCOME BANNER --- */
+        #welcomeBanner {
+            display: none;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--glow-color);
+            text-shadow: 0 0 20px var(--glow-color);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
         }
 
         @keyframes pulseGlow {
-            0% { box-shadow: 0 0 10px rgba(0, 212, 255, 0.2); border-color: rgba(0, 212, 255, 0.5); }
-            50% { box-shadow: 0 0 25px rgba(0, 212, 255, 0.6); border-color: rgba(0, 212, 255, 1); }
-            100% { box-shadow: 0 0 10px rgba(0, 212, 255, 0.2); border-color: rgba(0, 212, 255, 0.5); }
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 212, 255, 0.3); border-color: rgba(0, 212, 255, 0.4); }
+            50% { box-shadow: 0 0 35px rgba(0, 212, 255, 0.7); border-color: var(--glow-color); }
         }
 
-        .controls { margin-bottom: 50px; display: flex; gap: 15px; z-index: 10; }
+        .controls { margin-bottom: 40px; display: flex; gap: 15px; z-index: 10; }
 
         button {
-            background: rgba(0, 212, 255, 0.05);
+            background: rgba(0, 212, 255, 0.1);
             border: 1px solid var(--glow-color);
             color: var(--glow-color);
             padding: 12px 24px;
             border-radius: 8px;
             cursor: pointer;
             transition: 0.3s;
-            text-transform: uppercase;
             font-weight: bold;
         }
 
-        button:hover {
-            background: var(--glow-color);
-            color: black;
-            box-shadow: 0 0 30px var(--glow-color);
-        }
+        button:hover { background: var(--glow-color); color: black; box-shadow: 0 0 30px var(--glow-color); }
 
         .container {
             display: flex;
-            gap: 30px;
+            gap: 25px;
             flex-wrap: wrap;
             justify-content: center;
-            perspective: 1200px;
         }
 
-        /* 3D Flip Card */
         .profile-card {
-            width: 240px;
-            height: 340px;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .profile-card:hover { transform: rotateY(180deg); }
-
-        .card-front, .card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 25px;
-            border: 2px solid var(--glow-color);
+            width: 230px;
+            height: 380px;
             background: var(--card-bg);
+            border-radius: 25px;
+            border: 2px solid rgba(0, 212, 255, 0.4);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            animation: pulseGlow 3s infinite ease-in-out;
+            animation: pulseGlow 4s infinite ease-in-out;
+            transition: transform 0.3s;
+            padding: 20px;
+            backdrop-filter: blur(5px);
         }
 
-        .card-back { transform: rotateY(180deg); background: linear-gradient(145deg, #050505, #001a20); }
+        .profile-card:hover { transform: translateY(-10px); }
 
         .profile-img {
-            width: 130px; height: 130px;
+            width: 120px; height: 120px;
             border-radius: 50%; border: 3px solid var(--glow-color);
-            margin-bottom: 20px; object-fit: cover;
+            margin-bottom: 15px; object-fit: cover;
         }
 
-        .name { font-size: 1.6rem; font-weight: bold; }
+        .name { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; }
 
         .status-area {
-            display: flex; align-items: center; gap: 10px; margin-top: 12px;
+            display: flex; align-items: center; gap: 10px;
             font-size: 0.9rem; padding: 5px 15px; border-radius: 15px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.05); margin-bottom: 20px;
         }
 
         .dot { width: 10px; height: 10px; border-radius: 50%; }
-        .online .dot { background: var(--online-color); box-shadow: 0 0 12px var(--online-color); }
-        .offline .dot { background: var(--offline-color); box-shadow: 0 0 8px var(--offline-color); }
+        .online .dot { background: var(--online-color); box-shadow: 0 0 10px var(--online-color); }
+        .offline .dot { background: var(--offline-color); }
 
         .fb-link {
             text-decoration: none; background: #1877F2; color: white;
-            padding: 12px 25px; border-radius: 30px; font-weight: bold;
-            transition: 0.3s;
+            padding: 10px 20px; border-radius: 20px; font-weight: bold;
+            transition: 0.3s; font-size: 0.8rem;
         }
 
-        /* --- LOGIN MODAL STYLE --- */
+        /* Login Modal */
         #loginModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center;
         }
-
-        .modal-content {
-            background: #111;
-            padding: 30px;
-            border: 2px solid var(--glow-color);
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 0 30px var(--glow-color);
-        }
-
-        input {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            background: #222;
-            border: 1px solid #444;
-            color: white;
-            border-radius: 5px;
-        }
+        .modal-content { background: #111; padding: 30px; border: 2px solid var(--glow-color); border-radius: 15px; text-align: center; }
+        input { display: block; width: 100%; padding: 10px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; }
 
         .admin-active .status-area { cursor: pointer; border: 1px dashed white; }
     </style>
 </head>
 <body>
 
+    <canvas id="canvas"></canvas>
+
+    <div id="welcomeBanner">Welcome Lyzy</div>
+
     <div class="controls">
-        <button onclick="toggleMusic()">🎵 Bg Music</button>
+        <button onclick="toggleMusic()">🎵 Music</button>
         <button onclick="openLogin()">🛠️ Admin: <span id="admin-status">OFF</span></button>
     </div>
 
@@ -168,6 +152,55 @@
     <audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
 
 <script>
+    // --- BACKGROUND COMET SCRIPT ---
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Star {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2;
+            this.speed = Math.random() * 3 + 1;
+        }
+        draw() {
+            ctx.fillStyle = '#00d4ff';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+            // Comet tail
+            ctx.strokeStyle = 'rgba(0, 212, 255, 0.2)';
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - 20, this.y - 10);
+            ctx.stroke();
+        }
+        update() {
+            this.x += this.speed;
+            this.y += this.speed / 2;
+            if (this.x > canvas.width) this.x = -20;
+            if (this.y > canvas.height) this.y = -20;
+        }
+    }
+
+    for (let i = 0; i < 50; i++) stars.push(new Star());
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stars.forEach(s => { s.update(); s.draw(); });
+        requestAnimationFrame(animate);
+    }
+    animate();
+
+    // --- PROFILE LOGIC ---
     const profileData = [
         { name: "Alex", img: "https://i.pravatar.cc/150?u=a1", fb: "https://facebook.com" },
         { name: "Jordan", img: "https://i.pravatar.cc/150?u=a2", fb: "https://facebook.com" },
@@ -183,64 +216,54 @@
         const card = document.createElement('div');
         card.className = 'profile-card';
         card.innerHTML = `
-            <div class="card-front">
-                <img src="${user.img}" class="profile-img">
-                <div class="name">${user.name}</div>
-                <div class="status-area online" onclick="handleStatusChange(event, this)">
-                    <span class="dot"></span>
-                    <span class="status-text">Online</span>
-                </div>
+            <img src="${user.img}" class="profile-img">
+            <div class="name">${user.name}</div>
+            <div class="status-area online" onclick="handleStatusChange(event, this)">
+                <span class="dot"></span>
+                <span class="status-text">Online</span>
             </div>
-            <div class="card-back">
-                <div class="name" style="margin-bottom:25px;">Connect</div>
-                <a href="${user.fb}" target="_blank" class="fb-link">Facebook Profile</a>
-            </div>
+            <a href="${user.fb}" target="_blank" class="fb-link">Visit Facebook</a>
         `;
         grid.appendChild(card);
     });
 
     function openLogin() {
         if (isAdmin) {
-            // If already admin, clicking turns it off
             isAdmin = false;
             document.getElementById('admin-status').innerText = "OFF";
+            document.getElementById('welcomeBanner').style.display = 'none';
             document.body.classList.remove('admin-active');
             return;
         }
         document.getElementById('loginModal').style.display = 'flex';
     }
 
-    function closeLogin() {
-        document.getElementById('loginModal').style.display = 'none';
-    }
+    function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
 
     function checkLogin() {
-        const user = document.getElementById('username').value;
-        const pass = document.getElementById('password').value;
-
-        if (user === "lyzy" && pass === "prolyzy") {
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        if (u === "lyzy" && p === "prolyzy") {
             isAdmin = true;
             document.getElementById('admin-status').innerText = "ON";
+            document.getElementById('welcomeBanner').style.display = 'block';
             document.body.classList.add('admin-active');
             closeLogin();
-            playClick();
+            document.getElementById('clickSound').play();
         } else {
-            alert("Wrong credentials!");
+            alert("Unauthorized!");
         }
     }
 
     function handleStatusChange(event, element) {
-        event.stopPropagation(); 
-        if (!isAdmin) { playClick(); return; }
-        
+        if (!isAdmin) return;
         const isOnline = element.classList.contains('online');
         element.classList.toggle('online', !isOnline);
         element.classList.toggle('offline', isOnline);
         element.querySelector('.status-text').innerText = isOnline ? "Offline" : "Online";
-        playClick();
+        document.getElementById('clickSound').play();
     }
 
-    function playClick() { document.getElementById('clickSound').play(); }
     function toggleMusic() {
         const m = document.getElementById('bgMusic');
         m.paused ? m.play() : m.pause();
